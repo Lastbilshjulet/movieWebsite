@@ -1,0 +1,21 @@
+
+.fa-chevron-down {
+    margin-left: .5em;
+}
+.dividers {
+    margin-left: 2em;
+    margin-right: 2em;
+}
+.rating {
+    margin-left: 1em;
+    margin-right: 1em;
+    border-radius: .5em;
+    color: lightgray;
+    background-color: darkslategray;
+}
+.pointer {
+    cursor: pointer;
+}
+body {
+    overflow-y: scroll; /* Show scrollbars */
+}
