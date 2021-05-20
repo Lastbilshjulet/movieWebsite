@@ -6,15 +6,15 @@ It consists of three python scripts, a mySQL database and a website using HTML, 
 
 The three scripts in python each have a purpose.
 
-    The first one scrapes information from IMDB's website. (This'll break soon since they are updating their website.)
+  The first one scrapes information from IMDB's website. (This'll break soon since they are updating their website.)
     
-    The second one uploads this information to the database.
+  The second one uploads this information to the database.
     
-    The third one uses the justwatch API from here: [GitHub](https://github.com/dawoudt/JustWatchAPI) to search for the movies and parses the query to then upload the information on whether movies can be streamed legally somewhere on to the database. 
+  The third one uses the justwatch API from here: [GitHub](https://github.com/dawoudt/JustWatchAPI) to search for the movies and parses the query to then upload the information on whether movies can be streamed legally somewhere on to the database. 
     
 The mySQL database is hard to upload here, but it has 6 tables
 
-    movies | users | watchlist | followlist | streamable | streamsites
+  movies | users | watchlist | followlist | streamable | streamsites
 
 It's a very simple relational database. You can figure out the attributes yourself. 
 
