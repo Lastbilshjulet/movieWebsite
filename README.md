@@ -6,9 +6,9 @@ It consists of three python scripts, a mySQL database and a website using HTML, 
 
 ## Scripts
 
-The three scripts in python each have a purpose.
+The three scripts in python each have a purpose, but to go through them all you need to do is run imdbScrape.py since it uses the other two.
 
-  1. The first one scrapes information from IMDB's website. (This'll break soon since they are updating their website.)
+  1. The first one scrapes information from IMDB's website. (~~This'll break soon since they are updating their website.~~)  - UPDATED
     
   2. The second one uploads this information to the database.
     
