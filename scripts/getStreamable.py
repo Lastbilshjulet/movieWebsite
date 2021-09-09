@@ -30,7 +30,7 @@ def uploadNewStreamables():
         streamable = getStreamables(movie)
         if streamable is not None:
             for streamsite in streamable:
-                print(streamsite)
+                print(" - ", streamsite['url'])
                 checkStreamsite(db_connection, db_cursor, streamsite)
                 uploadStreamable(db_connection, db_cursor, streamsite, movie)
 
