@@ -33,12 +33,12 @@ def insert_db(x):
     return query, val
 
 def upload_to_db(movies):
-    #try:
-    #    with open('movies.json', 'r') as infile:
-    #        movies = list(json.load(infile))
-    #except:
-    #    print("movies.json could not be opened.")
-    #    exit()
+    # try:
+    #     with open('movies.json', 'r') as infile:
+    #         movies = list(json.load(infile))
+    # except:
+    #     print("movies.json could not be opened.")
+    #     exit()
 
     db_connection = None
     try:
@@ -89,6 +89,3 @@ def upload_to_db(movies):
         print("closed connections...")
     except:
         print("could not close connections")
-    finally:
-        print("exiting...")
-        exit()
