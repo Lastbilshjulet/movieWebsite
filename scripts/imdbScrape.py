@@ -1,8 +1,5 @@
 #!/usr/bin/python3
-
 # -*- coding; utf-8 -*-
-
-
 
 import json
 import ssl
@@ -10,7 +7,7 @@ from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 
 import uploadtoDB
-import getStreamble
+import getStreamable
 
 # For ignoring SSL certificate errors
 ctx = ssl.create_default_context()
@@ -33,14 +30,14 @@ def get_web_page_content(url):
 
 def get_minutes(hour_minutes):
     if hour_minutes.find("h") == -1:
-        return hour_minutes.strip("min ")
-    elif hour_minutes.find("min") == -1:
+        return hour_minutes.strip("m ")
+    elif hour_minutes.find("m") == -1:
         hours = hour_minutes.strip("h ")
         return int(hours) * 60
     else:
         duration = hour_minutes.split()
         hours = duration[0].strip("h ")
-        minutes = duration[1].strip("min ")
+        minutes = duration[1].strip("m ")
         return str((int(hours) * 60) + int(minutes))
 
 # Going into individual movie/tv show URL and extracting extra details
@@ -52,9 +49,9 @@ def get_extra_details(movie):
     movie["ratings"] = ratingValue + ' based on ' + ratingUsers
     time = inner_soup.findAll('li', attrs={'class': 'ipc-inline-list__item'})
     movie["duration"] = get_minutes(time[2].text.strip())
-    movie["summary"] = inner_soup.find('span', attrs={'class': 'gCtawA'}).text.strip()
+    movie["summary"] = inner_soup.find('span', attrs={'class': 'eqbKRZ'}).text.strip()
 
-    people = inner_soup.find('div', attrs={'class': 'iGxbgr'})
+    people = inner_soup.find('div', attrs={'class': 'hzbDAm'})
     Allpeople = people.findAll('li', attrs={'class': 'ipc-metadata-list__item'})
     # movie["director"]
     directors = Allpeople[0].findAll('a', attrs={'class': 'ipc-metadata-list-item__list-content-item'})
@@ -97,7 +94,7 @@ def get_top_rated_imdb_hits(url, file_name, nos):
         ref = a["href"].split("/")
         movie["id"] = ref[2][2:]
         ref = "/" + ref[1] + "/" + ref[2]
-        movie["imdb_link"] = "https://www.imdb.com" + ref
+        movie["imdb_link"] = "https://www.imdb.com" + ref + "/"
         movie_data = td.text.strip().split("\n")
         movie["rank"], movie["name"], movie["year"] = movie_data[0].strip(
         '.'), movie_data[1].strip(), movie_data[2].strip()[1:5]
@@ -109,14 +106,15 @@ def get_top_rated_imdb_hits(url, file_name, nos):
             break
 
     # Creates a json file with all the information that you extracted
-    # with open(file_name, 'w') as outfile:
-    #     json.dump(movies, outfile, indent=4)
+    with open(file_name, 'w') as outfile:
+        json.dump(movies, outfile, indent=4)
 
     print("----------- scraped movie list -----------")
     print("-------- uploading new list to db --------")
     uploadtoDB.upload_to_db(movies)
+    
     print("-------- uploading new streamables --------")
-    getStreamble.uploadNewStreamables()
+    getStreamable.uploadNewStreamables()
 
 get_top_rated_imdb_hits(top_movies_url, 'movies.json', 250)
 #get_top_rated_imdb_hits(top_tv_shows_url, 'tv_shows.json', 250)

@@ -1,22 +1,25 @@
 #!/usr/bin/python3
 
 from justwatch import JustWatch
-
-import json
 import mysql.connector as mysql
 from mysql.connector import Error
 
-hostName = "hostname"
-dbName = "database"
-userName = "username"
-password = "password"
-
+def fetchDbConfig():
+    login = []
+    with open('.dbconfig', 'r') as infile:
+        for i, line in enumerate(infile):
+            login.append(line.replace("\n", ""))
+        infile.close()
+    return login
 
 def uploadNewStreamables():
+    login = fetchDbConfig()
+
     # Connect to the DB
     db_connection = None
     try:
-        db_connection = mysql.connect(host=hostName, database=dbName, user=userName, passwd=password)
+        print(login[0], login[1], login[2], login[3])
+        db_connection = mysql.connect(host=login[0], database=login[1], user=login[2], passwd=login[3])
         db_cursor = db_connection.cursor()
     except Error as e:
         print("Could not connect to the database: ", e)
@@ -106,7 +109,6 @@ def getStreamables(movie):
     streams = removeDupes(streams)
 
     return streams
-
 
 def removeDupes(streams):
     res = []

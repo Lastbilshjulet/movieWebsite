@@ -4,10 +4,13 @@ import json
 import mysql.connector as mysql
 from mysql.connector import Error
 
-hostName = "hostname"
-dbName = "database"
-userName = "username"
-password = "password"
+def fetchDbConfig():
+    login = []
+    with open('.dbconfig', 'r') as infile:
+        for i, line in enumerate(infile):
+            login.append(line.replace("\n", ""))
+        infile.close()
+    return login
 
 def execute_query(db_connection, db_cursor, query, val):
     try:
@@ -33,16 +36,20 @@ def insert_db(x):
     return query, val
 
 def upload_to_db(movies):
-    # try:
-    #     with open('movies.json', 'r') as infile:
-    #         movies = list(json.load(infile))
-    # except:
-    #     print("movies.json could not be opened.")
-    #     exit()
+    if not movies:
+        print("No movies passed, checking local json file...")
+        try:
+            with open('movies.json', 'r') as infile:
+                movies = list(json.load(infile))
+        except:
+            print("movies.json could not be opened.")
+            exit()
+    
+    login = fetchDbConfig()
 
     db_connection = None
     try:
-        db_connection = mysql.connect(host=hostName, database=dbName, user=userName, passwd=password)
+        db_connection = mysql.connect(host=login[0], database=login[1], user=login[2], passwd=login[3])
         db_cursor = db_connection.cursor()
     except:
         print("Could not connect to the database.")
