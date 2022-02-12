@@ -43,6 +43,8 @@ def get_minutes(hour_minutes):
 # Going into individual movie/tv show URL and extracting extra details
 def get_extra_details(movie):
     inner_soup = get_web_page_content(movie["imdb_link"])
+    movie["poster"] = inner_soup.find('div', attrs={'class': 'ipc-media--poster-27x40'}).find('img').get("src")
+
     rating = inner_soup.find('div', attrs={'class': 'hmJkIS'})
     ratingValue = rating.find('span', attrs={'class': 'iTLWoV'}).text.strip()
     ratingUsers = rating.find('div', attrs={'class': 'jkCVKJ'}).text.strip()
@@ -116,6 +118,7 @@ def get_top_rated_imdb_hits(url, file_name, nos):
     print("-------- uploading new streamables --------")
     getStreamable.uploadNewStreamables()
 
-get_top_rated_imdb_hits(top_movies_url, 'movies.json', 250)
+uploadtoDB.upload_to_db([])
+#get_top_rated_imdb_hits(top_movies_url, 'movies.json', 250)
 #get_top_rated_imdb_hits(top_tv_shows_url, 'tv_shows.json', 250)
 print('--------- Extraction of data is complete. Check JSON file. ---------')

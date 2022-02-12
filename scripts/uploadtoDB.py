@@ -30,9 +30,9 @@ def update_rank_db(movieRank, movieID):
     return query, val
 
 def insert_db(x):
-    attr = "movieID, movieLink, movieRank, movieName, movieYear, movieRatings, movieDuration, movieSummary, movieDirector, movieWriters, movieStars"
-    query = "INSERT INTO movie (" + attr + ") VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-    val = (x["id"], x["imdb_link"], x["rank"], x["name"], x["year"], x["ratings"], x["duration"], x["summary"], x["director"], x["writers"], x["stars"])
+    attr = "movieID, movieLink, movieRank, movieName, moviePoster, movieYear, movieRatings, movieDuration, movieSummary, movieDirector, movieWriters, movieStars"
+    query = "INSERT INTO movie (" + attr + ") VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    val = (x["id"], x["imdb_link"], x["rank"], x["name"], x["poster"], x["year"], x["ratings"], x["duration"], x["summary"], x["director"], x["writers"], x["stars"])
     return query, val
 
 def upload_to_db(movies):
