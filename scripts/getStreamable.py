@@ -4,6 +4,7 @@ from justwatch import JustWatch
 import mysql.connector as mysql
 from mysql.connector import Error
 
+
 def fetchDbConfig():
     login = []
     with open('.dbconfig', 'r') as infile:
@@ -12,6 +13,7 @@ def fetchDbConfig():
         infile.close()
     return login
 
+
 def uploadNewStreamables():
     login = fetchDbConfig()
 
@@ -19,7 +21,8 @@ def uploadNewStreamables():
     db_connection = None
     try:
         print(login[0], login[1], login[2], login[3])
-        db_connection = mysql.connect(host=login[0], database=login[1], user=login[2], passwd=login[3])
+        db_connection = mysql.connect(
+            host=login[0], database=login[1], user=login[2], passwd=login[3])
         db_cursor = db_connection.cursor()
     except Error as e:
         print("Could not connect to the database: ", e)
@@ -39,6 +42,7 @@ def uploadNewStreamables():
 
     print("----------- upload done -----------")
 
+
 def removeStreamables(conn, curs):
     query = "DELETE FROM streamable WHERE movieID > 0"
     execute_query(conn, curs, query)
@@ -46,7 +50,8 @@ def removeStreamables(conn, curs):
 
 
 def checkStreamsite(conn, curs, stream):
-    query = "SELECT COUNT(streamsiteID) FROM streamsite WHERE streamsiteID = " + str(stream['providerID'])
+    query = "SELECT COUNT(streamsiteID) FROM streamsite WHERE streamsiteID = " + \
+        str(stream['providerID'])
     curs.execute(query)
     streamsiteID = curs.fetchone()
     if (streamsiteID[0] == 0):
@@ -55,7 +60,8 @@ def checkStreamsite(conn, curs, stream):
 
 def insertStreamsite(conn, curs, site):
     siteName = '"' + site["url"][10:20] + '"'
-    query = "INSERT INTO streamsite VALUES (" + str(site['providerID']) + ", " + siteName + ")"
+    query = "INSERT INTO streamsite VALUES (" + \
+        str(site['providerID']) + ", " + siteName + ")"
     execute_query(conn, curs, query)
 
 
@@ -74,7 +80,8 @@ def uploadStreamable(conn, curs, streams, movie):
 
 def insertStreamable(stream, movieID):
     siteName = '"' + stream["url"] + '"'
-    query = "INSERT INTO streamable VALUES (" + str(movieID) + ", " + str(stream['providerID']) + ", " + siteName + ")"
+    query = "INSERT INTO streamable VALUES (" + str(movieID) + ", " + str(
+        stream['providerID']) + ", " + siteName + ")"
     return query
 
 
@@ -87,7 +94,8 @@ def getMovies(curs):
 def getStreamables(movie):
     just_watch = JustWatch(country='SE')
     print(movie[1])
-    results = just_watch.search_for_item(query=movie[1], content_types=['movie'])
+    results = just_watch.search_for_item(
+        query=movie[1], content_types=['movie'])
 
     try:
         items = results['items']
@@ -109,6 +117,7 @@ def getStreamables(movie):
     streams = removeDupes(streams)
 
     return streams
+
 
 def removeDupes(streams):
     res = []

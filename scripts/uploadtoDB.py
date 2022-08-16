@@ -4,6 +4,7 @@ import json
 import mysql.connector as mysql
 from mysql.connector import Error
 
+
 def fetchDbConfig():
     login = []
     with open('.dbconfig', 'r') as infile:
@@ -12,6 +13,7 @@ def fetchDbConfig():
         infile.close()
     return login
 
+
 def execute_query(db_connection, db_cursor, query, val):
     try:
         db_cursor.execute(query, val)
@@ -19,21 +21,27 @@ def execute_query(db_connection, db_cursor, query, val):
     except:
         print("could not commit query")
 
+
 def update_ratings_db(movieRatings, movieID):
     query = "UPDATE movie SET movieRatings = %s WHERE movieID = %s"
     val = (movieRatings, movieID)
     return query, val
-    
+
+
 def update_rank_db(movieRank, movieID):
     query = "UPDATE movie SET movieRank = %s WHERE movieID = %s"
     val = (movieRank, movieID)
     return query, val
 
+
 def insert_db(x):
     attr = "movieID, movieLink, movieRank, movieName, moviePoster, movieYear, movieRatings, movieDuration, movieSummary, movieDirector, movieWriters, movieStars"
-    query = "INSERT INTO movie (" + attr + ") VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-    val = (x["id"], x["imdb_link"], x["rank"], x["name"], x["poster"], x["year"], x["ratings"], x["duration"], x["summary"], x["director"], x["writers"], x["stars"])
+    query = "INSERT INTO movie (" + attr + \
+        ") VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    val = (x["id"], x["imdb_link"], x["rank"], x["name"], x["poster"], x["year"],
+           x["ratings"], x["duration"], x["summary"], x["director"], x["writers"], x["stars"])
     return query, val
+
 
 def upload_to_db(movies):
     if not movies:
@@ -44,15 +52,16 @@ def upload_to_db(movies):
         except:
             print("movies.json could not be opened.")
             exit()
-    
+
     login = fetchDbConfig()
 
     db_connection = None
     try:
-        db_connection = mysql.connect(host=login[0], database=login[1], user=login[2], passwd=login[3])
+        db_connection = mysql.connect(
+            host=login[0], database=login[1], user=login[2], passwd=login[3])
         db_cursor = db_connection.cursor()
-    except:
-        print("Could not connect to the database.")
+    except Error as e:
+        print("Could not connect to the database.", e)
         exit()
 
     movie = []

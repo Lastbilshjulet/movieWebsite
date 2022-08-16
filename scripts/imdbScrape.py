@@ -19,14 +19,18 @@ top_movies_url = "https://www.imdb.com/chart/top/"
 top_tv_shows_url = "https://www.imdb.com/chart/toptv"
 
 # Fetching the BeautifulSoup object of an HTML page by passing its URL
+
+
 def get_web_page_content(url):
     # Making the website believe that you are accessing it using a mozilla browser
-    req = Request(url, headers={'User-Agent': 'Mozilla/5.0', 'Accept-Language': 'en-US'})
+    req = Request(
+        url, headers={'User-Agent': 'Mozilla/5.0', 'Accept-Language': 'en-US'})
     webpage = urlopen(req).read()
 
     # Creating a BeautifulSoup object of the html page for easy extraction of data.
     soup = BeautifulSoup(webpage, 'html.parser')
     return soup
+
 
 def get_minutes(hour_minutes):
     if hour_minutes.find("h") == -1:
@@ -41,22 +45,30 @@ def get_minutes(hour_minutes):
         return str((int(hours) * 60) + int(minutes))
 
 # Going into individual movie/tv show URL and extracting extra details
+
+
 def get_extra_details(movie):
     inner_soup = get_web_page_content(movie["imdb_link"])
-    movie["poster"] = inner_soup.find('div', attrs={'class': 'ipc-media--poster-27x40'}).find('img').get("src")
+    movie["poster"] = inner_soup.find(
+        'div', attrs={'class': 'ipc-media--poster-27x40'}).find('img').get("src")
 
-    rating = inner_soup.find('div', attrs={'class': 'hmJkIS'})
-    ratingValue = rating.find('span', attrs={'class': 'iTLWoV'}).text.strip()
-    ratingUsers = rating.find('div', attrs={'class': 'jkCVKJ'}).text.strip()
+    rating = inner_soup.find('div', attrs={'class': 'fAePGh'})
+    ratingValue = rating.find('span', attrs={'class': 'jGRxWM'}).text.strip()
+    ratingUsers = rating.find('div', attrs={'class': 'dPVcnq'}).text.strip()
     movie["ratings"] = ratingValue + ' based on ' + ratingUsers
-    time = inner_soup.findAll('li', attrs={'class': 'ipc-inline-list__item'})
-    movie["duration"] = get_minutes(time[2].text.strip())
-    movie["summary"] = inner_soup.find('span', attrs={'class': 'eqbKRZ'}).text.strip()
+    time = inner_soup.find('ul', attrs={'class': 'kqWovI'})
+    time = time.findAll('li', attrs={'class': 'ipc-inline-list__item'})
+    movie["duration"] = get_minutes(time[-1].text.strip())
+    print(movie["duration"])
+    movie["summary"] = inner_soup.find(
+        'span', attrs={'class': 'gXUyNh'}).text.strip()
 
-    people = inner_soup.find('div', attrs={'class': 'hzbDAm'})
-    Allpeople = people.findAll('li', attrs={'class': 'ipc-metadata-list__item'})
+    people = inner_soup.find('div', attrs={'class': 'fjLeDR'})
+    Allpeople = people.findAll(
+        'li', attrs={'class': 'ipc-metadata-list__item'})
     # movie["director"]
-    directors = Allpeople[0].findAll('a', attrs={'class': 'ipc-metadata-list-item__list-content-item'})
+    directors = Allpeople[0].findAll(
+        'a', attrs={'class': 'ipc-metadata-list-item__list-content-item'})
     for director in directors:
         if director == directors[0]:
             AllDirectors = director.text.strip()
@@ -64,7 +76,8 @@ def get_extra_details(movie):
             AllDirectors += ", " + director.text.strip()
     movie["director"] = AllDirectors
     # movie["writers"]
-    writers = Allpeople[1].findAll('a', attrs={'class': 'ipc-metadata-list-item__list-content-item'})
+    writers = Allpeople[1].findAll(
+        'a', attrs={'class': 'ipc-metadata-list-item__list-content-item'})
     for writer in writers:
         if writer == writers[0]:
             AllWriters = writer.text.strip()
@@ -72,7 +85,8 @@ def get_extra_details(movie):
             AllWriters += ", " + writer.text.strip()
     movie["writers"] = AllWriters
     # movie["stars"]
-    stars = Allpeople[2].findAll('a', attrs={'class': 'ipc-metadata-list-item__list-content-item'})
+    stars = Allpeople[2].findAll(
+        'a', attrs={'class': 'ipc-metadata-list-item__list-content-item'})
     for star in stars:
         if star == stars[0]:
             Allstars = star.text.strip()
@@ -82,6 +96,8 @@ def get_extra_details(movie):
     return movie
 
 # Fetching details of n number of movie/tv shows from the IMDB lists
+
+
 def get_top_rated_imdb_hits(url, file_name, nos):
     print("------" + url + "------")
     soup = get_web_page_content(url)
@@ -99,7 +115,7 @@ def get_top_rated_imdb_hits(url, file_name, nos):
         movie["imdb_link"] = "https://www.imdb.com" + ref + "/"
         movie_data = td.text.strip().split("\n")
         movie["rank"], movie["name"], movie["year"] = movie_data[0].strip(
-        '.'), movie_data[1].strip(), movie_data[2].strip()[1:5]
+            '.'), movie_data[1].strip(), movie_data[2].strip()[1:5]
         print(movie["rank"], movie["name"])
         movie = get_extra_details(movie)
         movies.append(movie)
@@ -114,11 +130,11 @@ def get_top_rated_imdb_hits(url, file_name, nos):
     print("----------- scraped movie list -----------")
     print("-------- uploading new list to db --------")
     uploadtoDB.upload_to_db(movies)
-    
+
     print("-------- uploading new streamables --------")
     getStreamable.uploadNewStreamables()
 
-uploadtoDB.upload_to_db([])
-#get_top_rated_imdb_hits(top_movies_url, 'movies.json', 250)
+
+get_top_rated_imdb_hits(top_movies_url, 'movies.json', 250)
 #get_top_rated_imdb_hits(top_tv_shows_url, 'tv_shows.json', 250)
 print('--------- Extraction of data is complete. Check JSON file. ---------')
