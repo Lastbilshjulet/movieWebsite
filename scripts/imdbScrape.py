@@ -59,7 +59,6 @@ def get_extra_details(movie):
     time = inner_soup.find('ul', attrs={'class': 'kqWovI'})
     time = time.findAll('li', attrs={'class': 'ipc-inline-list__item'})
     movie["duration"] = get_minutes(time[-1].text.strip())
-    print(movie["duration"])
     movie["summary"] = inner_soup.find(
         'span', attrs={'class': 'gXUyNh'}).text.strip()
 
