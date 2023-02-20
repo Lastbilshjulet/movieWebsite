@@ -58,7 +58,7 @@ def get_duration(soup):
 
 
 def get_summary(soup):
-    return soup.find('span', attrs={'class': 'iVsSMD'}).text.strip()
+    return soup.find('span', attrs={'class': 'jWocDE'}).text.strip()
 
 
 def get_people(soup):
