@@ -32,9 +32,11 @@ def get_poster(soup):
 
 
 def get_ratings(soup):
-    rating = soup.find('div', attrs={'class': 'ffGvYF'})
-    ratingValue = rating.find('span', attrs={'class': 'gvYTvP'}).text.strip()
-    ratingUsers = rating.find('div', attrs={'class': 'gZKrvZ'}).text.strip()
+    rating = soup.find('div', attrs={'class': 'fWLLZP'})
+    ratingValue = rating.find(
+        'span', attrs={'class': 'sc-e457ee34-1'}).text.strip()
+    ratingUsers = rating.find(
+        'div', attrs={'class': 'sc-e457ee34-3'}).text.strip()
     return ratingValue + ' based on ' + ratingUsers
 
 
@@ -52,17 +54,17 @@ def get_minutes(hour_minutes):
 
 
 def get_duration(soup):
-    time = soup.find('ul', attrs={'class': 'iQHuAC'})
+    time = soup.find('ul', attrs={'class': 'kdXikI'})
     time = time.findAll('li', attrs={'class': 'ipc-inline-list__item'})
     return get_minutes(time[-1].text.strip())
 
 
 def get_summary(soup):
-    return soup.find('span', attrs={'class': 'jWocDE'}).text.strip()
+    return soup.find('span', attrs={'class': 'sc-35061649-2'}).text.strip()
 
 
 def get_people(soup):
-    people = soup.find('div', attrs={'class': 'fgzezW'})
+    people = soup.find('div', attrs={'class': 'sc-eda143c4-3'})
     return people.findAll('li', attrs={'class': 'ipc-metadata-list__item'})
 
 
