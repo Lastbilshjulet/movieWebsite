@@ -32,7 +32,7 @@ def get_poster(soup):
 
 
 def get_ratings(soup):
-    rating = soup.find('div', attrs={'class': 'fWLLZP'})
+    rating = soup.find('div', attrs={'class': 'sc-1c39e262-0'})
     ratingValue = rating.find(
         'span', attrs={'class': 'sc-e457ee34-1'}).text.strip()
     ratingUsers = rating.find(
@@ -54,18 +54,24 @@ def get_minutes(hour_minutes):
 
 
 def get_duration(soup):
-    time = soup.find('ul', attrs={'class': 'kdXikI'})
+    time = soup.find('ul', attrs={'class': 'ipc-inline-list--show-dividers'})
     time = time.findAll('li', attrs={'class': 'ipc-inline-list__item'})
     return get_minutes(time[-1].text.strip())
 
 
 def get_summary(soup):
-    return soup.find('span', attrs={'class': 'sc-35061649-2'}).text.strip()
+    return soup.find('span', attrs={'role': 'presentation'}).text.strip()
+
+
+def get_people_parent(soup):
+    for child in soup.descendants:
+        if child.text == 'Director' or child.text == 'Directors':
+            return child.parent.parent
+    print('No any directors found on the page')
 
 
 def get_people(soup):
-    people = soup.find('div', attrs={'class': 'sc-eda143c4-3'})
-    return people.findAll('li', attrs={'class': 'ipc-metadata-list__item'})
+    return get_people_parent(soup).findAll('li', attrs={'class': 'ipc-inline-list__item'})
 
 
 def find_in_list(list):
