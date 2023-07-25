@@ -40,38 +40,13 @@ def get_ratings(soup):
     return ratingValue + ' based on ' + ratingUsers
 
 
-def get_minutes(hour_minutes):
-    if hour_minutes.find("h") == -1:
-        return hour_minutes.strip("m ")
-    elif hour_minutes.find("m") == -1:
-        hours = hour_minutes.strip("h ")
-        return int(hours) * 60
-    else:
-        duration = hour_minutes.split()
-        hours = duration[0].strip("h ")
-        minutes = duration[1].strip("m ")
-        return str((int(hours) * 60) + int(minutes))
-
-
-def get_duration(soup):
-    time = soup.find('ul', attrs={'class': 'ipc-inline-list--show-dividers'})
-    time = time.findAll('li', attrs={'class': 'ipc-inline-list__item'})
-    return get_minutes(time[-1].text.strip())
-
-
 def get_summary(soup):
-    return soup.find('span', attrs={'role': 'presentation'}).text.strip()
-
-
-def get_people_parent(soup):
-    for child in soup.descendants:
-        if child.text == 'Director' or child.text == 'Directors':
-            return child.parent.parent
-    print('No any directors found on the page')
+    return soup.find('span', attrs={'class': 'sc-7193fc79-2'}).text.strip()
 
 
 def get_people(soup):
-    return get_people_parent(soup).findAll('li', attrs={'class': 'ipc-inline-list__item'})
+    artist_list = soup.find('ul', attrs={'class': 'title-pc-list'})
+    return artist_list.findAll(recursive=False)
 
 
 def find_in_list(list):
@@ -93,7 +68,6 @@ def get_extra_details(movie):
 
     movie["poster"] = get_poster(soup)
     movie["ratings"] = get_ratings(soup)
-    movie["duration"] = get_duration(soup)
     movie["summary"] = get_summary(soup)
 
     all_people = get_people(soup)
@@ -105,30 +79,72 @@ def get_extra_details(movie):
     return movie
 
 
+def get_minutes(hour_minutes):
+    if hour_minutes.find("h") == -1:
+        return hour_minutes.strip("m ")
+    elif hour_minutes.find("m") == -1:
+        hours = hour_minutes.strip("h ")
+        return int(hours) * 60
+    else:
+        duration = hour_minutes.split()
+        hours = duration[0].strip("h ")
+        minutes = duration[1].strip("m ")
+        return str((int(hours) * 60) + int(minutes))
+
+
+def get_duration(soup):
+    metadata = soup.find('div', attrs={'class': 'cli-title-metadata'})
+    return get_minutes(metadata.findAll('span')[1].text.strip())
+
+
+def get_release_year(soup):
+    metadata = soup.find('div', attrs={'class': 'cli-title-metadata'})
+    return metadata.findAll('span')[0].text.strip()
+
+
+def get_title(soup):
+    a = soup.find('a')
+    movie_data = a.find('h3').text.split()
+    movie_data.pop(0)
+    return ' '.join(movie_data)
+
+
+def get_rank(soup):
+    a = soup.find('a')
+    movie_data = a.find('h3').text.split()
+    return movie_data[0].strip('.')
+
+
+def get_link(movie):
+    return "https://www.imdb.com/title/tt" + movie["id"] + "/"
+
+
+def get_movie_id(soup):
+    a = soup.find('a')
+    ref = a["href"].split("/")
+    return ref[2][2:]
+
+
 def get_top_rated_imdb_hits(url, file_name):
     print("------" + url + "------")
     soup = get_web_page_content(url)
-    divs = soup.find('tbody', attrs={'class': 'lister-list'})
+    movie_list = soup.find('ul', attrs={'class': 'compact-list-view'})
     movies = []
 
-    for item in divs.findAll('tr'):
+    for item in movie_list.findAll('li', attrs={'class': 'ipc-metadata-list-summary-item'}):
         movie = {}
-        td = item.find('td', attrs={'class': 'titleColumn'})
+        item_data = item.find('div', attrs={'class': "fBusXE"})
 
-        a = td.find('a')
-        ref = a["href"].split("/")
-        movie["id"] = ref[2][2:]
-        movie["imdb_link"] = "https://www.imdb.com/title/tt" + movie["id"] + "/"
-
-        movie_data = td.text.strip().split("\n")
-        movie["rank"] = movie_data[0].strip('.')
-        movie["name"] = movie_data[1].strip()
-        movie["year"] = movie_data[2].strip()[1:5]
+        movie["id"] = get_movie_id(item_data)
+        movie["imdb_link"] = get_link(movie)
+        movie["rank"] = get_rank(item_data)
+        movie["name"] = get_title(item_data)
+        movie["year"] = get_release_year(item_data)
+        movie["duration"] = get_duration(item_data)
 
         print(movie["rank"], movie["name"])
 
         movie = get_extra_details(movie)
-
         movies.append(movie)
 
     # Creates a json file with all the information that you extracted
