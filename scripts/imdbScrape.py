@@ -5,6 +5,7 @@ import json
 import ssl
 from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
+import time
 
 import uploadtoDB
 import getStreamable
@@ -41,7 +42,7 @@ def get_ratings(soup):
 
 
 def get_summary(soup):
-    return soup.find('span', attrs={'class': 'sc-7193fc79-2'}).text.strip()
+    return soup.find('span', attrs={'class': 'sc-466bb6c-2'}).text.strip()
 
 
 def get_people(soup):
@@ -133,7 +134,7 @@ def get_top_rated_imdb_hits(url, file_name):
 
     for item in movie_list.findAll('li', attrs={'class': 'ipc-metadata-list-summary-item'}):
         movie = {}
-        item_data = item.find('div', attrs={'class': "fBusXE"})
+        item_data = item.find('div', attrs={'class': "cli-children"})
 
         movie["id"] = get_movie_id(item_data)
         movie["imdb_link"] = get_link(movie)

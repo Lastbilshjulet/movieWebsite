@@ -15,12 +15,13 @@ def fetchDbConfig():
 
 
 def uploadNewStreamables():
+    print("----- API NO LONGER WORKING -----")
+    return
     login = fetchDbConfig()
 
     # Connect to the DB
     db_connection = None
     try:
-        print(login[0], login[1], login[2], login[3])
         db_connection = mysql.connect(
             host=login[0], database=login[1], user=login[2], passwd=login[3])
         db_cursor = db_connection.cursor()
