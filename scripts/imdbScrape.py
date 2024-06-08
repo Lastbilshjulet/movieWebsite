@@ -8,7 +8,6 @@ from bs4 import BeautifulSoup
 import time
 
 import uploadtoDB
-import getStreamable
 
 # For ignoring SSL certificate errors
 ctx = ssl.create_default_context()
@@ -42,7 +41,7 @@ def get_ratings(soup):
 
 
 def get_summary(soup):
-    return soup.find('span', attrs={'class': 'sc-466bb6c-2'}).text.strip()
+    return soup.find('span', attrs={'class': 'sc-eb5317c9-2'}).text.strip()
 
 
 def get_people(soup):
@@ -157,7 +156,7 @@ def get_top_rated_imdb_hits(url, file_name):
     uploadtoDB.upload_to_db(movies)
 
     print("-------- uploading new streamables --------")
-    getStreamable.uploadNewStreamables()
+    # getStreamable.uploadNewStreamables()
 
 
 get_top_rated_imdb_hits(top_movies_url, 'movies.json')
