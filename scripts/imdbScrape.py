@@ -2,29 +2,27 @@
 # -*- coding; utf-8 -*-
 
 import json
-import ssl
-from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
+from selenium import webdriver
 import time
 
 import uploadtoDB
-
-# For ignoring SSL certificate errors
-ctx = ssl.create_default_context()
-ctx.check_hostname = False
-ctx.verify_mode = ssl.CERT_NONE
 
 # Urls that need to be scraped
 top_movies_url = "https://www.imdb.com/chart/top/"
 top_tv_shows_url = "https://www.imdb.com/chart/toptv"
 
+def get_web_page_content(url, wait):
+    options = webdriver.FirefoxOptions()
+    driver = webdriver.Firefox(options=options)
+    driver.get(url=url)
+    if wait:
+        driver.implicitly_wait(10)
+        time.sleep(2)
+    page = driver.page_source
+    driver.close()
 
-def get_web_page_content(url):
-    req = Request(
-        url, headers={'User-Agent': 'Mozilla/5.0', 'Accept-Language': 'en-US'})
-    webpage = urlopen(req).read()
-
-    return BeautifulSoup(webpage, 'html.parser')
+    return BeautifulSoup(page, 'html.parser')
 
 
 def get_poster(soup):
@@ -64,7 +62,7 @@ def get_names(people):
 
 
 def get_extra_details(movie):
-    soup = get_web_page_content(movie["imdb_link"])
+    soup = get_web_page_content(movie["imdb_link"], False)
 
     movie["poster"] = get_poster(soup)
     movie["ratings"] = get_ratings(soup)
@@ -127,7 +125,7 @@ def get_movie_id(soup):
 
 def get_top_rated_imdb_hits(url, file_name):
     print("------" + url + "------")
-    soup = get_web_page_content(url)
+    soup = get_web_page_content(url, True)
     movie_list = soup.find('ul', attrs={'class': 'compact-list-view'})
     movies = []
 
