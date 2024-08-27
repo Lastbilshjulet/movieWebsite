@@ -30,16 +30,16 @@ def get_poster(soup):
 
 
 def get_ratings(soup):
-    rating = soup.find('div', attrs={'class': 'sc-bde20123-0'})
+    rating = soup.find('div', attrs={'class': 'sc-eb51e184-0'})
     ratingValue = rating.find(
-        'span', attrs={'class': 'sc-bde20123-1'}).text.strip()
+        'span', attrs={'class': 'sc-eb51e184-1'}).text.strip()
     ratingUsers = rating.find(
-        'div', attrs={'class': 'sc-bde20123-3'}).text.strip()
+        'div', attrs={'class': 'sc-eb51e184-3'}).text.strip()
     return ratingValue + ' based on ' + ratingUsers
 
 
 def get_summary(soup):
-    return soup.find('span', attrs={'class': 'sc-eb5317c9-2'}).text.strip()
+    return soup.find('span', attrs={'class': 'sc-2d37a7c7-2'}).text.strip()
 
 
 def get_people(soup):
