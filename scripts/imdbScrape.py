@@ -65,14 +65,24 @@ def get_extra_details(movie):
     soup = get_web_page_content(movie["imdb_link"], False)
 
     movie["poster"] = get_poster(soup)
+
     movie["ratings"] = get_ratings(soup)
     movie["summary"] = get_summary(soup)
 
     all_people = get_people(soup)
 
-    movie["director"] = get_names(all_people[0])
-    movie["writers"] = get_names(all_people[1])
-    movie["stars"] = get_names(all_people[2])
+    if len(all_people) >= 1:
+        movie["director"] = get_names(all_people[0])
+    else:
+        movie["director"] = ""
+    if len(all_people) >= 2:
+        movie["writers"] = get_names(all_people[1])
+    else:
+        movie["writers"] = ""
+    if len(all_people) >= 3:
+        movie["stars"] = get_names(all_people[2])
+    else:
+        movie["stars"] = ""
 
     return movie
 
@@ -149,38 +159,55 @@ def get_top_rated_imdb_hits(url, file_name):
     print("------" + url + "------")
     soup = get_web_page_content(url, True)
     movie_list = soup.find('ul', attrs={'class': 'compact-list-view'})
-    movies = []
 
-    for index, item in enumerate(movie_list.findAll('li', attrs={'class': 'ipc-metadata-list-summary-item'})):
-        movie = {}
-        item_data = item.find('div', attrs={'class': "cli-children"})
+    with open('movies.json', 'r') as infile:
+        movies = list(json.load(infile))
 
-        movie["id"] = get_movie_id(item_data)
-        movie["imdb_link"] = get_link(movie)
-        movie["rank"] = get_rank(item_data)
-        movie["name"] = get_title(item_data)
-        movie["year"] = get_release_year(item_data)
-        movie["duration"] = get_duration(item_data)
+    if len(movies) == 250:
+        print("All movies were scraped last time, updating all...")
+        movies = []
 
-        print(movie["rank"], movie["name"])
+    try:
+        for index, item in enumerate(movie_list.findAll('li', attrs={'class': 'ipc-metadata-list-summary-item'})):
+            if index < len(movies):
+                print(movies[index]["name"], "is already scraped, skipping...")
+                continue
+            movie = {}
+            item_data = item.find('div', attrs={'class': "cli-children"})
 
-        movie = get_extra_details(movie)
+            movie["id"] = get_movie_id(item_data)
+            movie["imdb_link"] = get_link(movie)
+            movie["rank"] = get_rank(item_data)
+            movie["name"] = get_title(item_data)
+            movie["year"] = get_release_year(item_data)
+            movie["duration"] = get_duration(item_data)
 
-        if index == 0:
-            if are_valid_shawshank_details(movie):
-                movies.append(movie)
-            else:
-                break
+            print(movie["rank"], movie["name"])
+
+            movie = get_extra_details(movie)
+
+            if index == 0:
+                if not are_valid_shawshank_details(movie):
+                    break
+
+            movies.append(movie)
+    except Exception as e:
+        print("Failed to scrape until movie with rank", len(movies))
+        print(e)
 
     # Creates a json file with all the information that you extracted
     with open(file_name, 'w') as outfile:
         json.dump(movies, outfile, indent=4)
 
+    if len(movies) != 250:
+        print("Failed to scrape all movies, only got", len(movies), ". Will not store in db")
+        get_top_rated_imdb_hits(url, file_name)
+
     print("----------- scraped movie list -----------")
     print("-------- uploading new list to db --------")
     uploadtoDB.upload_to_db(movies)
 
-    print("-------- uploading new streamables --------")
+    # print("-------- uploading new streamables --------")
     # getStreamable.uploadNewStreamables()
 
 
