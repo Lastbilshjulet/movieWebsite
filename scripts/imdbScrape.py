@@ -30,16 +30,16 @@ def get_poster(soup):
 
 
 def get_ratings(soup):
-    rating = soup.find('div', attrs={'class': 'sc-eb51e184-0'})
+    rating = soup.find('div', attrs={'class': 'sc-d541859f-0'})
     ratingValue = rating.find(
-        'span', attrs={'class': 'sc-eb51e184-1'}).text.strip()
+        'span', attrs={'class': 'sc-d541859f-1'}).text.strip()
     ratingUsers = rating.find(
-        'div', attrs={'class': 'sc-eb51e184-3'}).text.strip()
+        'div', attrs={'class': 'sc-d541859f-3'}).text.strip()
     return ratingValue + ' based on ' + ratingUsers
 
 
 def get_summary(soup):
-    return soup.find('span', attrs={'class': 'sc-2d37a7c7-2'}).text.strip()
+    return soup.find('span', attrs={'class': 'sc-3ac15c8d-1'}).text.strip()
 
 
 def get_people(soup):
@@ -122,6 +122,28 @@ def get_movie_id(soup):
     ref = a["href"].split("/")
     return ref[2][2:]
 
+def are_valid_shawshank_details(movie):
+    expected_movie = {
+        "id": "0111161",
+        "imdb_link": "https://www.imdb.com/title/tt0111161/",
+        "rank": "1",
+        "name": "The Shawshank Redemption",
+        "year": "1994",
+        "duration": "142",
+        "poster": "https://m.media-amazon.com/images/M/MV5BMDAyY2FhYjctNDc5OS00MDNlLThiMGUtY2UxYWVkNGY2ZjljXkEyXkFqcGc@._V1_QL75_UX190_CR0,2,190,281_.jpg",
+        "ratings": "9.3 based on 3M",
+        "summary": "A banker convicted of uxoricide forms a friendship over a quarter century with a hardened convict, while maintaining his innocence and trying to remain hopeful through simple compassion.",
+        "director": "Frank Darabont",
+        "writers": "Stephen King, Frank Darabont",
+        "stars": "Tim Robbins, Morgan Freeman, Bob Gunton"
+    }
+
+    for key in expected_movie:
+        if movie.get(key) != expected_movie[key]:
+            print(movie.get(key), "was not equal to", expected_movie[key])
+            return False
+    return True
+
 
 def get_top_rated_imdb_hits(url, file_name):
     print("------" + url + "------")
@@ -129,7 +151,7 @@ def get_top_rated_imdb_hits(url, file_name):
     movie_list = soup.find('ul', attrs={'class': 'compact-list-view'})
     movies = []
 
-    for item in movie_list.findAll('li', attrs={'class': 'ipc-metadata-list-summary-item'}):
+    for index, item in enumerate(movie_list.findAll('li', attrs={'class': 'ipc-metadata-list-summary-item'})):
         movie = {}
         item_data = item.find('div', attrs={'class': "cli-children"})
 
@@ -143,7 +165,12 @@ def get_top_rated_imdb_hits(url, file_name):
         print(movie["rank"], movie["name"])
 
         movie = get_extra_details(movie)
-        movies.append(movie)
+
+        if index == 0:
+            if are_valid_shawshank_details(movie):
+                movies.append(movie)
+            else:
+                break
 
     # Creates a json file with all the information that you extracted
     with open(file_name, 'w') as outfile:
